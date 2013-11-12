@@ -16,21 +16,47 @@ module.exports = function(grunt) {
   var ghpage = require('ghpage');
 
   grunt.registerMultiTask('ghpage', 'Your task description goes here.', function() {
-    var done = this.async();
-
-    if (!this.data.input) {
-      return grunt.log.error('input is required');
-    }
-
-    this.data.output = this.data.output || '.';
-    this.data.design = this.data.design || 'simple';
-
-    ghpage(this.data, function(err) {
-      if (err) {
-        grunt.log.error(err);
-      }
-      done();
+    var options = this.options({
+      design: 'simple'
     });
+    var done = this.async();
+    var total = this.files.length;
+    var current = 0;
+
+    this.files.forEach(function(f) {
+      // Concat specified files.
+      var src = f.src.filter(function(filepath) {
+        // Warn on and remove invalid source files (if nonull was set).
+        if (!grunt.file.exists(filepath)) {
+          grunt.log.warn('Source file "' + filepath + '" not found.');
+          return false;
+        } else {
+          return true;
+        }
+      }).map(function(filepath) {
+        // Read file source.
+        return grunt.file.read(filepath);
+      }).join('\n');
+
+      options.input = src;
+      options.output = f.dest;
+
+      ghpage(options, function(err) {
+        if (err) {
+          grunt.log.error(err);
+        }
+
+        grunt.log.writeln('ghpage "' + options.design + '" generated here: "' + f.dest + '".');
+
+        current++;
+        if (total === current) {
+          done();
+        }
+      });
+
+    });
+
+
   });
 
 };

@@ -31,12 +31,14 @@ module.exports = function(grunt) {
     // Configuration to be run (and then tested).
     ghpage: {
       simple: {
-        input: 'docs.md',
-        output: 'out',
-        //design: 'simple', //defaults to simple
-        data: {
-          pageTitle: 'Test title'
-        }
+        options: {
+          //design: 'simple', //defaults to simple
+          data: {
+            pageTitle: 'Test title'
+          }
+        },
+        src: 'docs.md',
+        dest: 'tmp'
       }
     },
 
